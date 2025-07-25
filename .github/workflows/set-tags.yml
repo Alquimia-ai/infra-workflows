@@ -1,0 +1,23 @@
+name: Determine Tags
+
+on:
+  workflow_call:
+    outputs:
+      tags:
+        description: "Docker tags based on branch"
+        value: ${{ jobs.set-tag.outputs.tag }}
+
+jobs:
+  set-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.set.outputs.tags }}
+    steps:
+      - id: set
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "tag=stable" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF_NAME}" == "develop" ]]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          else
+            echo "tag=unknown" >> $GITHUB_OUTPUT
