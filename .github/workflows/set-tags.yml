@@ -21,3 +21,4 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           else
             echo "tag=unknown" >> $GITHUB_OUTPUT
+          fi
