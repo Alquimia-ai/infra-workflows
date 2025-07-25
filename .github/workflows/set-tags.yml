@@ -11,7 +11,7 @@ jobs:
   set-tag:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.set.outputs.tags }}
+      tags: ${{ steps.set.outputs.tag }}
     steps:
       - id: set
         run: |
