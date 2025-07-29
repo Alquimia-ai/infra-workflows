@@ -2,6 +2,11 @@ name: Determine Tags
 
 on:
   workflow_call:
+    inputs:
+      ref_name:
+        description: "Git reference name"
+        required: true
+        type: string
     outputs:
       tags:
         description: "Docker tags based on branch"
@@ -11,13 +16,13 @@ jobs:
   set-tag:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.set.outputs.tag }}
+      tag: ${{ steps.set.outputs.tag }}
     steps:
       - id: set
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+          if [[ "${{ inputs.ref_name }}" == "main" ]]; then
             echo "tag=stable" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "develop" ]]; then
+          elif [[ "${{ inputs.ref_name }}" == "develop" ]]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
           else
             echo "tag=unknown" >> $GITHUB_OUTPUT
