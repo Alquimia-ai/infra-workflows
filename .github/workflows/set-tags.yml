@@ -11,19 +11,26 @@ on:
       tags:
         description: "Docker tags based on branch"
         value: ${{ jobs.set-tag.outputs.tag }}
+      environment:
+        description: "Deployment environment based on branch"
+        value: ${{ jobs.set-tag.outputs.environment }}
 
 jobs:
   set-tag:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.set.outputs.tag }}
+      environment: ${{ steps.set.outputs.environment }}
     steps:
       - id: set
         run: |
           if [[ "${{ inputs.ref_name }}" == "main" ]]; then
             echo "tag=stable" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
           elif [[ "${{ inputs.ref_name }}" == "develop" ]]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
           else
             echo "tag=unknown" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
           fi
