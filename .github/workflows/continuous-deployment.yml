@@ -23,9 +23,6 @@ on:
       GITOPS_REPO_TOKEN:
         required: true
 
-permissions:
-  contents: write
-
 jobs:
   update-gitops:
     runs-on: ubuntu-latest
