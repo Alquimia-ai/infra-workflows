@@ -19,11 +19,56 @@ on:
         description: Application name to update (e.g., insight-hub)
         required: true
         type: string
+      debug:
+        description: Enable debug job
+        required: false
+        type: boolean
+        default: false
     secrets:
       GITOPS_REPO_TOKEN:
         required: true
 
 jobs:
+  debug-inputs:
+    if: ${{ inputs.debug }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print received inputs
+        shell: bash
+        run: |
+          echo "TAG=${{ inputs.tag }}"
+          echo "ENV=${{ inputs.environment }}"
+          echo "APPS_DIR=${{ inputs.apps_dir }}"
+          echo "APP_NAME=${{ inputs.app_name }}"
+
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: Alquimia-ai/infrastructure-gitops
+          token: ${{ secrets.GITOPS_REPO_TOKEN }}
+          path: gitops
+          ref: openshift
+
+      - name: Inspect GitOps layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Listing root and gitops directory"
+          ls -la || true
+          ls -la gitops || true
+          TARGET_DIR="gitops/${{ inputs.apps_dir }}/${{ inputs.app_name }}/overlays/${{ inputs.environment }}"
+          echo "Target dir: ${TARGET_DIR}"
+          if [ -d "${TARGET_DIR}" ]; then
+            ls -la "${TARGET_DIR}"
+          else
+            echo "Target directory not found: ${TARGET_DIR}"
+          fi
+          if [ -f "${TARGET_DIR}/image-tag-patch.yaml" ]; then
+            echo "Found file: ${TARGET_DIR}/image-tag-patch.yaml"
+          else
+            echo "Missing file: ${TARGET_DIR}/image-tag-patch.yaml"
+          fi
+
   update-gitops:
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +91,10 @@ jobs:
           set -euo pipefail
           echo "Updating overlay: $ENV with tag: $TAG"
           cd gitops/${APPS_DIR}/${APP_NAME}/overlays/$ENV
+          if [ ! -f image-tag-patch.yaml ]; then
+            echo "Expected file not found: $(pwd)/image-tag-patch.yaml" >&2
+            exit 1
+          fi
           sed -i "s|alquimiaai/${APP_NAME}:.*|alquimiaai/${APP_NAME}:${TAG}|" image-tag-patch.yaml
 
       - name: Commit and push changes to GitOps
