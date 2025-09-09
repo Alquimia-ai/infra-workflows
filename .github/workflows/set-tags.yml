@@ -25,12 +25,12 @@ jobs:
       - id: set
         run: |
           if [[ "${{ inputs.ref_name }}" == "main" ]]; then
-            echo "tag=stable" >> $GITHUB_OUTPUT
+            echo "tag=stable-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
             echo "environment=production" >> $GITHUB_OUTPUT
           elif [[ "${{ inputs.ref_name }}" == "develop" ]]; then
-            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "tag=latest-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
           else
-            echo "tag=unknown" >> $GITHUB_OUTPUT
+            echo "tag=unknown-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
