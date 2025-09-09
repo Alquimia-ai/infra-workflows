@@ -104,16 +104,10 @@ jobs:
           ENV: ${{ inputs.environment }}
           APP_NAME: ${{ inputs.app_name }}
         run: |
-          set -euo pipefail
           cd gitops
           git config user.name "GitHub Actions"
           git config user.email "ci@github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git commit -m "Update ${APP_NAME} image tag to ${TAG} for ${ENV}"
+          git commit -am "Update ${APP_NAME} image tag to ${TAG} for ${ENV}"
           git push origin openshift
 
 
