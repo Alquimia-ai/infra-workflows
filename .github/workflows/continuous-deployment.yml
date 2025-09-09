@@ -91,11 +91,11 @@ jobs:
           set -euo pipefail
           echo "Updating overlay: $ENV with tag: $TAG"
           cd gitops/${APPS_DIR}/${APP_NAME}/overlays/$ENV
-          if [ ! -f image-tag-patch.yaml ]; then
-            echo "Expected file not found: $(pwd)/image-tag-patch.yaml" >&2
+          if [ ! -f kustomization.yaml ]; then
+            echo "Expected file not found: kustomization.yaml" >&2
             exit 1
           fi
-          sed -i "s|alquimiaai/${APP_NAME}:.*|alquimiaai/${APP_NAME}:${TAG}|" image-tag-patch.yaml
+          sed -i "s|\(newTag:\s*\).*|\1${TAG}|" kustomization.yaml
 
       - name: Commit and push changes to GitOps
         shell: bash
