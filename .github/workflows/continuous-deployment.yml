@@ -1,10 +1,7 @@
 name: Continuous Deployment to GitOps
 
 on:
-  push:
-    branches:
-      - '**'
-  workflow_dispatch:
+  workflow_call:
     inputs:
       tag:
         description: Image tag to deploy
@@ -13,10 +10,7 @@ on:
       environment:
         description: Deployment environment (staging or production)
         required: true
-        type: choice
-        options:
-          - staging
-          - production
+        type: string
       apps_dir:
         description: Base directory that contains the applications (e.g., apps)
         required: true
@@ -25,6 +19,9 @@ on:
         description: Application name to update (e.g., insight-hub)
         required: true
         type: string
+    secrets:
+      GITOPS_REPO_TOKEN:
+        required: true
 
 permissions:
   contents: write
@@ -44,10 +41,10 @@ jobs:
       - name: Update image tag in overlay
         shell: bash
         env:
-          TAG: ${{ github.event.inputs.tag }}
-          ENV: ${{ github.event.inputs.environment }}
-          APPS_DIR: ${{ github.event.inputs.apps_dir }}
-          APP_NAME: ${{ github.event.inputs.app_name }}
+          TAG: ${{ inputs.tag }}
+          ENV: ${{ inputs.environment }}
+          APPS_DIR: ${{ inputs.apps_dir }}
+          APP_NAME: ${{ inputs.app_name }}
         run: |
           set -euo pipefail
           echo "Updating overlay: $ENV with tag: $TAG"
@@ -57,9 +54,9 @@ jobs:
       - name: Commit and push changes to GitOps
         shell: bash
         env:
-          TAG: ${{ github.event.inputs.tag }}
-          ENV: ${{ github.event.inputs.environment }}
-          APP_NAME: ${{ github.event.inputs.app_name }}
+          TAG: ${{ inputs.tag }}
+          ENV: ${{ inputs.environment }}
+          APP_NAME: ${{ inputs.app_name }}
         run: |
           set -euo pipefail
           cd gitops
