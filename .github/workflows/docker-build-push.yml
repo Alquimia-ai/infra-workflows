@@ -9,6 +9,10 @@ on:
       image_tag:
         required: true
         type: string
+      context:
+        required: false
+        type: string
+        default: .
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -39,6 +43,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ inputs.context }}
           push: true
           tags: ${{ inputs.image_name }}:${{ steps.tag.outputs.tag }}
