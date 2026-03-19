@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: .
+      dockerfile:
+        required: false
+        type: string
+        default: ./Dockerfile
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -44,5 +48,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
           push: true
           tags: ${{ inputs.image_name }}:${{ steps.tag.outputs.tag }}
